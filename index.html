@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <title>NINJA RUNNER | MRS WORKS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ゲーム全体のコンテナ（広告枠の高さを除いた表示領域） -->
+    <div id="main-wrapper">
+
+        <!-- プレイ画面の直上バー (スコア＆ポーズボタン) -->
+        <div id="topControlBar" class="top-control-bar">
+            <div class="hud-left">
+                <span id="scoreText">0m</span>
+            </div>
+            <div>
+                <button id="pauseBtn" class="icon-btn" aria-label="Pause">⏸️</button>
+            </div>
+        </div>
+
+        <!-- ゲーム画面（Canvas） -->
+        <div id="game-container">
+            <canvas id="gameCanvas"></canvas>
+
+            <div class="ui-layer">
+                <!-- スタート画面 -->
+                <div id="startScreen" class="modal-screen">
+                    <h1>NINJA RUNNER</h1>
+                    <div id="titleHighScore" class="high-score">HIGH SCORE: 0m</div>
+                    <p>タップでジャンプ！空中タップで2段ジャンプ！<br>迫りくるカラスや敵忍者をかわして走れ！</p>
+                    <div class="btn-group">
+                        <button id="startBtn" class="btn">PLAY</button>
+                    </div>
+                </div>
+
+                <!-- ポーズ画面 -->
+                <div id="pauseScreen" class="modal-screen hidden">
+                    <h1 class="title-warning">PAUSED</h1>
+                    <p class="pause-desc">一時停止中</p>
+                    <div class="btn-group">
+                        <button id="resumeBtn" class="btn">RESUME</button>
+                        <button id="pauseHomeBtn" class="btn btn-secondary">HOME</button>
+                    </div>
+                </div>
+
+                <!-- ゲームオーバー画面 -->
+                <div id="gameOverScreen" class="modal-screen hidden">
+                    <h1 class="title-danger">GAME OVER</h1>
+                    <p id="finalScoreText" class="final-score">0m</p>
+                    <div id="overHighScore" class="high-score">HIGH SCORE: 0m</div>
+                    <div class="btn-group">
+                        <button id="restartBtn" class="btn">RETRY</button>
+                        <button id="overHomeBtn" class="btn btn-secondary">HOME</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         固定広告
+    ========================================= -->
+    <div class="ad-banner" id="adBox">
+
+        <div style="max-width: 100%;">
+
+            <!-- admax -->
+            <script src="https://adm.shinobi.jp/s/8a495d941206bf0c34aff9559f8d2cea"></script>
+            <!-- admax -->
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
