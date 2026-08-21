@@ -830,25 +830,59 @@ function spawnStageElements() {
             platforms.push(newPlat);
             createdPlatform = newPlat;
 
+            // 設置済みのアイテム/障害物の位置（重なり防止用）
+            const placedXList = [];
+
             // 敵忍者（1000m解禁）
             if (allowEnemy && width > 220 && Math.random() < 0.45) {
-                enemyNinjas.push(new EnemyNinja(newPlat));
+                const enemy = new EnemyNinja(newPlat);
+                enemyNinjas.push(enemy);
+                placedXList.push(enemy.x + enemy.width / 2);
             } else {
-                // ジャンプ台（500m解禁）または トゲ（300m解禁）
+                // ギミック（トゲ/ジャンプ台）の配置箇所をランダム化
                 const randGimmick = Math.random();
-                if (allowSpring && randGimmick < 0.35) {
-                    springPads.push(new SpringPad(nextX + 40, nextY - 12));
-                } else if (allowSpike && randGimmick < 0.75) {
-                    obstacles.push(new Obstacle(nextX + width / 2, nextY - 25, 25, 25, 'spike'));
+                const margin = 30;
+                const minSpawnX = newPlat.x + margin;
+                const maxSpawnX = newPlat.x + newPlat.width - margin - 30;
+
+                if (maxSpawnX > minSpawnX) {
+                    if (allowSpring && randGimmick < 0.35) {
+                        const springX = minSpawnX + Math.random() * (maxSpawnX - minSpawnX);
+                        springPads.push(new SpringPad(springX, nextY - 12));
+                        placedXList.push(springX + 15);
+                    } else if (allowSpike && randGimmick < 0.75) {
+                        const spikeX = minSpawnX + Math.random() * (maxSpawnX - minSpawnX);
+                        obstacles.push(new Obstacle(spikeX, nextY - 25, 25, 25, 'spike'));
+                        placedXList.push(spikeX + 12.5);
+                    }
                 }
             }
-        }
 
-        // ダンゴ（極まれにスポーン、プレイヤーが既に未所持の場合のみ）
-        if (!player.hasDango && createdPlatform && Math.random() < 0.8) {
-            const dangoX = createdPlatform.x + createdPlatform.width / 2;
-            const dangoY = createdPlatform.y - 45;
-            dangos.push(new Dango(dangoX, dangoY));
+            // ダンゴ（テスト確認用: 80%の確率で出現。本番時は 0.03 に変更してください）
+            // 既存ギミックと重ならない安全な位置を探して設置
+            if (!player.hasDango && Math.random() < 0.8) {
+                const margin = 35;
+                const minDangoX = newPlat.x + margin;
+                const maxDangoX = newPlat.x + newPlat.width - margin - 24;
+
+                if (maxDangoX > minDangoX) {
+                    let dangoX = minDangoX + Math.random() * (maxDangoX - minDangoX);
+                    let safe = true;
+
+                    // 既に置かれているギミック（トゲ・ジャンプ台・敵）と50px以上離れているかチェック
+                    for (const px of placedXList) {
+                        if (Math.abs((dangoX + 12) - px) < 50) {
+                            safe = false;
+                            break;
+                        }
+                    }
+
+                    if (safe) {
+                        const dangoY = newPlat.y - 45;
+                        dangos.push(new Dango(dangoX, dangoY));
+                    }
+                }
+            }
         }
 
         // カラス（200m解禁）
