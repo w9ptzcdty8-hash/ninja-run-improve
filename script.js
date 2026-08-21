@@ -422,27 +422,24 @@ class Crow {
 // ========================================
 
 class FlyingShuriken {
-    constructor(x, y, fromFront = true) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
         this.width = 26;
         this.height = 26;
         this.rotation = 0;
-        this.fromFront = fromFront;
 
-        // カラス(gameSpeed + 2.5)より速い基準速度
-        const baseSpeed = fromFront ? (gameSpeed + 5.5) : (gameSpeed + 3.0);
+        // スピードをランダム（+4.0 ～ +7.0）にして個体差をつける
+        const randomSpeedOffset = 4.0 + Math.random() * 3.0;
+        const baseSpeed = gameSpeed + randomSpeedOffset;
 
         // 水平から±33度程度の範囲でランダムな飛行角度をつける
         const maxAngle = Math.PI / 5.5;
         const angle = (Math.random() * 2 - 1) * maxAngle;
 
-        if (fromFront) {
-            this.speedX = baseSpeed * Math.cos(angle); // 右から左へ高速飛行
-        } else {
-            this.speedX = -(baseSpeed * Math.cos(angle)); // 左から右へ（スクロールを追い抜くため実質加算）
-        }
-        this.speedY = baseSpeed * Math.sin(angle); // 斜め方向の縦移動成分
+        // 常に右から左へ飛来
+        this.speedX = baseSpeed * Math.cos(angle);
+        this.speedY = baseSpeed * Math.sin(angle);
     }
 
     update() {
@@ -456,9 +453,10 @@ class FlyingShuriken {
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
 
-        ctx.shadowColor = '#ff2e88';
-        ctx.shadowBlur = 12;
-        ctx.fillStyle = '#ff2e88';
+        // 濃い緑（#00e676）と光彩効果で視認性をアップ
+        ctx.shadowColor = '#00e676';
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = '#00e676';
         for (let i = 0; i < 4; i++) {
             ctx.rotate(Math.PI / 2);
             ctx.beginPath();
@@ -641,12 +639,12 @@ function spawnStageElements() {
     if (lastPlatform.x + lastPlatform.width < CANVAS_WIDTH + 300) {
 
         // 解禁タイミングの制御フラグ
-        const allowCrow = score >= 1200;           // 200m: カラス
-        const allowSpike = score >= 1300;          // 300m: トゲ
-        const allowSpring = score >= 1500;         // 500m: ジャンプ台
-        const allowComplex = score >= 1800;        // 800m: 複雑な足場
+        const allowCrow = score >= 200;           // 200m: カラス
+        const allowSpike = score >= 300;          // 300m: トゲ
+        const allowSpring = score >= 500;         // 500m: ジャンプ台
+        const allowComplex = score >= 800;        // 800m: 複雑な足場
         const allowEnemy = score >= 1000;         // 1000m: 敵忍者
-        const allowFlyingShuriken = score >= 100; // 1300m: 飛来する手裏剣
+        const allowFlyingShuriken = score >= 1300; // 1300m: 飛来する手裏剣
 
         // 足場間隔・幅の設定
         let minGap = 60, maxGap = 100, minWidth = 260, maxWidth = 420;
@@ -714,12 +712,11 @@ function spawnStageElements() {
             crows.push(new Crow(CANVAS_WIDTH + 100, crowY));
         }
 
-        // 飛来する手裏剣（1300m解禁: 前方または後方から高速飛来）
+        // 飛来する手裏剣（1300m解禁: 右側からのみ高速飛来）
         if (allowFlyingShuriken && Math.random() < 0.3) {
             const shurikenY = Math.random() * 160 + 100;
-            const fromFront = Math.random() < 0.6; // 60%は前から、40%は後ろから
-            const startX = fromFront ? CANVAS_WIDTH + 150 : -80;
-            flyingShurikens.push(new FlyingShuriken(startX, shurikenY, fromFront));
+            const startX = CANVAS_WIDTH + 150;
+            flyingShurikens.push(new FlyingShuriken(startX, shurikenY));
         }
     }
 }
