@@ -660,12 +660,12 @@ function spawnStageElements() {
     if (lastPlatform.x + lastPlatform.width < CANVAS_WIDTH + 300) {
 
         // 解禁タイミングの制御フラグ
-        const allowCrow = score >= 200;           // 200m: カラス
-        const allowSpike = score >= 300;          // 300m: トゲ
-        const allowSpring = score >= 500;         // 500m: ジャンプ台
-        const allowComplex = score >= 800;        // 800m: 複雑な足場
+        const allowCrow = score >= 1200;           // 200m: カラス
+        const allowSpike = score >= 1300;          // 300m: トゲ
+        const allowSpring = score >= 1500;         // 500m: ジャンプ台
+        const allowComplex = score >= 1800;        // 800m: 複雑な足場
         const allowEnemy = score >= 1000;         // 1000m: 敵忍者
-        const allowFlyingShuriken = score >= 1300; // 1300m: 飛来する手裏剣
+        const allowFlyingShuriken = score >= 10; // 1300m: 飛来する手裏剣
 
         // 足場間隔・幅の設定
         let minGap = 60, maxGap = 100, minWidth = 260, maxWidth = 420;
