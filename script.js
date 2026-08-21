@@ -60,7 +60,11 @@ function init() {
         initGame();
         drawBackground();
         player.draw();
-        gameLoop();
+        
+        // 初回ループ起動
+        if (!animationFrameId) {
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
     }, 50);
 }
 
@@ -171,6 +175,11 @@ let highScore = 0;
 let distance = 0;
 let animationFrameId = null;
 
+// FPS制御用
+const TARGET_FPS = 60;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
+let lastTime = 0;
+
 
 // ========================================
 // ハイスコア管理
@@ -196,6 +205,21 @@ function saveHighScore(newScore) {
     }
     titleHighScoreValue.innerText = `${highScore}m`;
     overHighScore.innerText = `HIGH SCORE: ${highScore}m`;
+}
+
+
+// ========================================
+// 共通関数
+// ========================================
+
+// 矩形の当たり判定を共通化
+function checkCollision(rectA, rectB, padding = 0) {
+    return (
+        rectA.x + padding < rectB.x + rectB.width &&
+        rectA.x + rectA.width - padding > rectB.x &&
+        rectA.y + padding < rectB.y + rectB.height &&
+        rectA.y + rectA.height - padding > rectB.y
+    );
 }
 
 
@@ -769,6 +793,9 @@ function initGame() {
     gameSpeed = FIXED_GAME_SPEED;
     player.reset();
 
+    // スコアのDOMもリセット（数字が変わる時のみ更新される仕様のため）
+    scoreText.innerText = "0m";
+
     platforms = [];
     obstacles = [];
     springPads = [];
@@ -970,12 +997,15 @@ function handleDamage() {
 }
 
 function update() {
-    if (gameState !== 'PLAYING') return;
-
+    // === 1. パフォーマンス改善（DOM更新の最適化） ===
     distance += gameSpeed;
-    score = Math.floor(distance / 10);
+    const newScore = Math.floor(distance / 10);
 
-    scoreText.innerText = `${score}m`;
+    // スコアが変わった時のみDOM（画面）を更新する
+    if (score !== newScore) {
+        score = newScore;
+        scoreText.innerText = `${score}m`;
+    }
 
     player.update();
 
@@ -984,6 +1014,7 @@ function update() {
         const p = platforms[i];
         p.update();
 
+        // プレイヤーの足場着地判定
         if (
             player.x + player.width > p.x &&
             player.x < p.x + p.width &&
@@ -1003,17 +1034,14 @@ function update() {
 
     if (!currentlyGrounded) player.isGrounded = false;
 
+    // === 2. 当たり判定ロジックの共通化（共通関数を利用） ===
+
     // ダンゴの獲得処理
     for (let i = dangos.length - 1; i >= 0; i--) {
         const d = dangos[i];
         d.update();
 
-        if (
-            player.x < d.x + d.width &&
-            player.x + player.width > d.x &&
-            player.y < d.y + d.height &&
-            player.y + player.height > d.y
-        ) {
+        if (checkCollision(player, d, 0)) {
             if (!player.hasDango) {
                 player.hasDango = true;
                 sfx.playPowerUp();
@@ -1026,59 +1054,49 @@ function update() {
         if (d.x + d.width < -50) dangos.splice(i, 1);
     }
 
+    // 敵忍者
     for (let i = enemyNinjas.length - 1; i >= 0; i--) {
         const e = enemyNinjas[i];
         e.update();
 
-        const p = 4;
-        if (
-            player.x + p < e.x + e.width &&
-            player.x + player.width - p > e.x &&
-            player.y + p < e.y + e.height &&
-            player.y + player.height - p > e.y
-        ) {
-            handleDamage();
-        }
+        if (checkCollision(player, e, 4)) handleDamage();
 
         if (e.x + e.width < -100) enemyNinjas.splice(i, 1);
     }
 
+    // カラス
     for (let i = crows.length - 1; i >= 0; i--) {
         const c = crows[i];
         c.update();
 
-        const p = 6;
-        if (
-            player.x + p < c.x + c.width &&
-            player.x + player.width - p > c.x &&
-            player.y + p < c.y + c.height &&
-            player.y + player.height - p > c.y
-        ) {
-            handleDamage();
-        }
+        if (checkCollision(player, c, 6)) handleDamage();
 
         if (c.x + c.width < -100) crows.splice(i, 1);
     }
 
+    // 手裏剣
     for (let i = flyingShurikens.length - 1; i >= 0; i--) {
         const fs = flyingShurikens[i];
         fs.update();
 
-        const p = 5;
-        if (
-            player.x + p < fs.x + fs.width &&
-            player.x + player.width - p > fs.x &&
-            player.y + p < fs.y + fs.height &&
-            player.y + player.height - p > fs.y
-        ) {
-            handleDamage();
-        }
+        if (checkCollision(player, fs, 5)) handleDamage();
 
         if (fs.x < -150 || fs.x > CANVAS_WIDTH + 200 || fs.y < -100 || fs.y > CANVAS_HEIGHT + 100) {
             flyingShurikens.splice(i, 1);
         }
     }
 
+    // トゲ
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.update();
+
+        if (checkCollision(player, obs, 4)) handleDamage();
+
+        if (obs.x + obs.width < -50) obstacles.splice(i, 1);
+    }
+
+    // ジャンプ台（特殊な踏む判定のため共通関数不使用）
     for (let i = springPads.length - 1; i >= 0; i--) {
         const s = springPads[i];
         s.update();
@@ -1094,23 +1112,6 @@ function update() {
         }
 
         if (s.x + s.width < -50) springPads.splice(i, 1);
-    }
-
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-        const obs = obstacles[i];
-        obs.update();
-
-        const p = 4;
-        if (
-            player.x + p < obs.x + obs.width &&
-            player.x + player.width - p > obs.x &&
-            player.y + p < obs.y + obs.height &&
-            player.y + player.height - p > obs.y
-        ) {
-            handleDamage();
-        }
-
-        if (obs.x + obs.width < -50) obstacles.splice(i, 1);
     }
 
     // 穴に落下した場合はダンゴ保持関係なく即死（ゲームオーバー）
@@ -1137,11 +1138,25 @@ function draw() {
     player.draw();
 }
 
-function gameLoop() {
+// === 3. 高リフレッシュレート対応（FPS固定制御） ===
+function gameLoop(currentTime) {
     if (gameState === 'PLAYING') {
-        update();
-        draw();
+        if (!lastTime) lastTime = currentTime;
+        const deltaTime = currentTime - lastTime;
+
+        // 設定したFPS（60FPS）の時間間隔を超えた時だけ更新する
+        if (deltaTime >= FRAME_INTERVAL) {
+            // 次のフレーム開始時間を調整（余剰時間を残すことでカクつき防止）
+            lastTime = currentTime - (deltaTime % FRAME_INTERVAL);
+            
+            update();
+            draw();
+        }
+    } else {
+        // プレイ中以外はタイマーをリセット
+        lastTime = 0;
     }
+    
     animationFrameId = requestAnimationFrame(gameLoop);
 }
 
@@ -1195,13 +1210,12 @@ function startGame() {
     sfx.init();
     initGame();
     gameState = 'PLAYING';
+    lastTime = 0; // ループのタイマーをリセット
 
     pushGameStateHistory();
     showScreen(null);
 
-    if (!animationFrameId) {
-        gameLoop();
-    }
+    // gameLoopの初回起動はinit内に移動済みなのでここでは状態変更のみ
 }
 
 function pauseGame() {
@@ -1213,6 +1227,7 @@ function pauseGame() {
 function resumeGame() {
     if (gameState !== 'PAUSED') return;
     gameState = 'PLAYING';
+    lastTime = 0; // タイマーリセットで再開時のワープ（高速進行）を防ぐ
     pushGameStateHistory();
     showScreen(null);
 }
