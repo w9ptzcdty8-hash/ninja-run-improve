@@ -440,8 +440,8 @@ class FlyingShuriken {
             this.x = rightAreaMinX + Math.random() * (rightAreaMaxX - rightAreaMinX);
             this.y = -40;
             // 【変更】 30度〜45度の範囲で斜め左下へ飛ぶ（度数をラジアンに変換）
-            const minDeg = 30;
-            const maxDeg = 45;
+            const minDeg = 15;
+            const maxDeg = 40;
             const deg = minDeg + Math.random() * (maxDeg - minDeg); // 30 ~ 45度
             const angle = deg * (Math.PI / 180);
 
@@ -454,7 +454,7 @@ class FlyingShuriken {
             this.y = CANVAS_HEIGHT + 10;
             // 【変更】 30度〜45度の範囲で斜め左上へ飛ぶ（下端からのためマイナス）
             const minDeg = 30;
-            const maxDeg = 45;
+            const maxDeg = 40;
             const deg = minDeg + Math.random() * (maxDeg - minDeg); // 30 ~ 45度
             const angle = -deg * (Math.PI / 180);
 
