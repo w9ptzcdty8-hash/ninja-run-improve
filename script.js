@@ -845,7 +845,7 @@ function spawnStageElements() {
         }
 
         // ダンゴ（極まれにスポーン、プレイヤーが既に未所持の場合のみ）
-        if (!player.hasDango && createdPlatform && Math.random() < 0.08) {
+        if (!player.hasDango && createdPlatform && Math.random() < 0.8) {
             const dangoX = createdPlatform.x + createdPlatform.width / 2;
             const dangoY = createdPlatform.y - 45;
             dangos.push(new Dango(dangoX, dangoY));
