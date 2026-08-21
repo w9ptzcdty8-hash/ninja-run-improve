@@ -562,7 +562,7 @@ class Dango {
         this.x = x;
         this.y = y;
         this.width = 24;
-        this.height = 32;
+        this.height = 36;
         this.floatFrame = Math.random() * Math.PI * 2;
     }
 
@@ -577,31 +577,48 @@ class Dango {
         const floatY = Math.sin(this.floatFrame) * 4;
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2 + floatY);
 
-        // 串
-        ctx.strokeStyle = '#d7ccc8';
-        ctx.lineWidth = 3;
+        // --- 竹串の描画 ---
+        // 串の外枠（濃いブラウンで強調）
+        ctx.strokeStyle = '#2b1704';
+        ctx.lineWidth = 4.5;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(0, -12);
-        ctx.lineTo(0, 14);
+        ctx.moveTo(0, -14); // 上端（ピンク団子の上に少し突き出る先端）
+        ctx.lineTo(0, 18);  // 下端（緑団子の下にしっかり伸びる持ち手）
         ctx.stroke();
 
-        // ピンク団子（上）
+        // 串の内側（竹・木目風の色）
+        ctx.strokeStyle = '#d7a15c';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.lineTo(0, 18);
+        ctx.stroke();
+
+        // --- 団子（3つの玉）の描画 ---
+        ctx.strokeStyle = '#211103';
+        ctx.lineWidth = 1.8;
+
+        // 1. ピンク団子（一番上）
         ctx.fillStyle = '#ff80ab';
         ctx.beginPath();
-        ctx.arc(0, -8, 6, 0, Math.PI * 2);
+        ctx.arc(0, -8, 6.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
-        // 白団子（中）
+        // 2. 白団子（中央）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
-        // 緑団子（下）
-        ctx.fillStyle = '#b9f6ca';
+        // 3. 緑団子（一番下）
+        ctx.fillStyle = '#00e676';
         ctx.beginPath();
-        ctx.arc(0, 8, 6, 0, Math.PI * 2);
+        ctx.arc(0, 8, 6.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
         ctx.restore();
     }
@@ -809,17 +826,20 @@ function spawnStageElements() {
                 enemyNinjas.push(new EnemyNinja(bottomPlat));
             }
         }
-        // 一本橋連続足場（1300m以上で高難易度生成）
+            
+        // 一本橋連続足場（1300m以上で高難易度生成: 1〜3本でランダム生成）
         else if (score >= 1300 && rand > 0.75) {
             let poleX = nextX;
-            for (let i = 0; i < 3; i++) {
+            const poleCount = Math.floor(Math.random() * 3) + 1; // ★ 1〜3 のランダムな整数を取得
+            for (let i = 0; i < poleCount; i++) {
                 const poleY = Math.random() * 60 + 250;
                 const p = new Platform(poleX, poleY, 75, CANVAS_HEIGHT - poleY, 'pole');
                 platforms.push(p);
-                if (i === 1) createdPlatform = p;
+                if (i === Math.floor(poleCount / 2)) createdPlatform = p;
                 poleX += 75 + Math.random() * 60 + 70;
             }
         }
+
         // 標準屋根足場
         else {
             const heightVariation = (score < 300) ? 50 : 100;
