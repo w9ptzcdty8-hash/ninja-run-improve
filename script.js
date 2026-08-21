@@ -680,11 +680,11 @@ function spawnStageElements() {
         // 足場間隔・幅の設定
         let minGap = 60, maxGap = 100, minWidth = 260, maxWidth = 420;
         if (score >= 1300) {
-            minGap = 100; maxGap = 160; minWidth = 140; maxWidth = 260;
+            minGap = 80; maxGap = 160; minWidth = 140; maxWidth = 300;
         } else if (score >= 800) {
-            minGap = 90; maxGap = 140; minWidth = 180; maxWidth = 300;
+            minGap = 80; maxGap = 140; minWidth = 180; maxWidth = 320;
         } else if (score >= 300) {
-            minGap = 80; maxGap = 120; minWidth = 220; maxWidth = 350;
+            minGap = 70; maxGap = 120; minWidth = 220; maxWidth = 350;
         }
 
         const rand = Math.random();
