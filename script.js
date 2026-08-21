@@ -878,9 +878,9 @@ function spawnStageElements() {
                 }
             }
 
-            // ダンゴ（テスト確認用: 80%の確率で出現。本番時は 0.03 に変更してください）
+            // ダンゴ（テスト確認用: 80%の確率で出現。本番時は 0.02 に変更してください）
             // 既存ギミックと重ならない安全な位置を探して設置
-            if (!player.hasDango && Math.random() < 0.9) {
+            if (!player.hasDango && Math.random() < 0.02) {
                 const margin = 35;
                 const minDangoX = newPlat.x + margin;
                 const maxDangoX = newPlat.x + newPlat.width - margin - 24;
