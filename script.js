@@ -562,7 +562,7 @@ class Dango {
         this.x = x;
         this.y = y;
         this.width = 24;
-        this.height = 32;
+        this.height = 36;
         this.floatFrame = Math.random() * Math.PI * 2;
     }
 
@@ -577,40 +577,43 @@ class Dango {
         const floatY = Math.sin(this.floatFrame) * 4;
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2 + floatY);
 
-        // 串（濃い枠線付き）
-        ctx.strokeStyle = '#2d1b00';
-        ctx.lineWidth = 4;
+        // --- 竹串の描画 ---
+        // 串の外枠（濃いブラウンで強調）
+        ctx.strokeStyle = '#2b1704';
+        ctx.lineWidth = 4.5;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(0, -12);
-        ctx.lineTo(0, 15);
+        ctx.moveTo(0, -14); // 上端（ピンク団子の上に少し突き出る先端）
+        ctx.lineTo(0, 18);  // 下端（緑団子の下にしっかり伸びる持ち手）
         ctx.stroke();
 
-        ctx.strokeStyle = '#d7ccc8';
-        ctx.lineWidth = 2;
+        // 串の内側（竹・木目風の色）
+        ctx.strokeStyle = '#d7a15c';
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.moveTo(0, -12);
-        ctx.lineTo(0, 15);
+        ctx.moveTo(0, -14);
+        ctx.lineTo(0, 18);
         ctx.stroke();
 
-        // 団子の輪郭線（ダークブラウン）
+        // --- 団子（3つの玉）の描画 ---
         ctx.strokeStyle = '#211103';
         ctx.lineWidth = 1.8;
 
-        // ピンク団子（上）
+        // 1. ピンク団子（一番上）
         ctx.fillStyle = '#ff80ab';
         ctx.beginPath();
         ctx.arc(0, -8, 6.5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // 白団子（中）
+        // 2. 白団子（中央）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // 緑団子（下）
+        // 3. 緑団子（一番下）
         ctx.fillStyle = '#00e676';
         ctx.beginPath();
         ctx.arc(0, 8, 6.5, 0, Math.PI * 2);
