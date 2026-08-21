@@ -744,7 +744,7 @@ function spawnStageElements() {
         }
 
         // 飛来する手裏剣（1300m解禁: 画面右側1/3範囲の 上・下・右端から出現）
-        if (allowFlyingShuriken && Math.random() < 0.3) {
+        if (allowFlyingShuriken && Math.random() < 0.7) {
             const randSide = Math.random();
             let spawnSide = 'right';
             if (randSide < 0.35) spawnSide = 'top';
