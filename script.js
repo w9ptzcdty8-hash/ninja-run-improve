@@ -577,31 +577,45 @@ class Dango {
         const floatY = Math.sin(this.floatFrame) * 4;
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2 + floatY);
 
-        // 串
-        ctx.strokeStyle = '#d7ccc8';
-        ctx.lineWidth = 3;
+        // 串（濃い枠線付き）
+        ctx.strokeStyle = '#2d1b00';
+        ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(0, -12);
-        ctx.lineTo(0, 14);
+        ctx.lineTo(0, 15);
         ctx.stroke();
+
+        ctx.strokeStyle = '#d7ccc8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, -12);
+        ctx.lineTo(0, 15);
+        ctx.stroke();
+
+        // 団子の輪郭線（ダークブラウン）
+        ctx.strokeStyle = '#211103';
+        ctx.lineWidth = 1.8;
 
         // ピンク団子（上）
         ctx.fillStyle = '#ff80ab';
         ctx.beginPath();
-        ctx.arc(0, -8, 6, 0, Math.PI * 2);
+        ctx.arc(0, -8, 6.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
         // 白団子（中）
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
         // 緑団子（下）
-        ctx.fillStyle = '#b9f6ca';
+        ctx.fillStyle = '#00e676';
         ctx.beginPath();
-        ctx.arc(0, 8, 6, 0, Math.PI * 2);
+        ctx.arc(0, 8, 6.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
 
         ctx.restore();
     }

@@ -49,7 +49,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 20px; /* 左端・右端に適度な隙間を設置 */
     background: transparent;
     color: #ffffff;
     font-weight: bold;
@@ -60,9 +60,17 @@ body {
 .hud-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* 距離表示の幅を固定化し、桁数変化による右側要素の横揺れを防止 */
+#scoreText {
+    display: inline-block;
+    min-width: 75px;
+    text-align: left;
+    font-variant-numeric: tabular-nums; /* 数字の等幅表示 */
 }
 
 .dango-hud-icon {
