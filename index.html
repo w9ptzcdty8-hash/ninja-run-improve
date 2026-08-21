@@ -29,14 +29,26 @@
             <canvas id="gameCanvas"></canvas>
 
             <div class="ui-layer">
-                <!-- スタート画面 -->
-                <div id="startScreen" class="modal-screen">
-                    <h1>NINJA RUNNER</h1>
-                    <div id="titleHighScore" class="high-score">HIGH SCORE: 0m</div>
-                    <p>タップでジャンプ！空中タップで2段ジャンプ！<br>迫りくるカラスや敵忍者をかわして走れ！</p>
-                    <div class="btn-group">
-                        <button id="startBtn" class="btn">PLAY</button>
+                <!-- スタート画面（タイトル画面） -->
+                <div id="startScreen" class="title-screen">
+                    <div class="title-logo">
+                        <span class="title-logo-main">NINJA</span>
+                        <span class="title-logo-sub">RUNNER</span>
                     </div>
+
+                    <div class="title-highscore">
+                        <span class="title-highscore-label">HIGH SCORE</span>
+                        <span id="titleHighScoreValue" class="title-highscore-value">0m</span>
+                    </div>
+
+                    <p class="title-desc">タップでジャンプ！空中タップで2段ジャンプ！<br>迫りくるカラスや敵忍者をかわして走れ！</p>
+
+                    <div class="btn-group">
+                        <button id="startBtn" class="btn btn-play">PLAY</button>
+                    </div>
+
+                    <!-- TODO: MRS GAMESの実際の遷移先URLに差し替える -->
+                    <a href="https://mrs-games.pages.dev/" target="_blank" rel="noopener noreferrer" class="mrs-games-link">MRS GAMES</a>
                 </div>
 
                 <!-- ポーズ画面 -->
