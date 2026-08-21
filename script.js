@@ -857,7 +857,7 @@ function spawnStageElements() {
         // 一本橋連続足場（1300m以上で高難易度生成: 1〜3本でランダム生成）
         else if (score >= 1300 && rand > 0.75) {
             let poleX = nextX;
-            const poleCount = Math.floor(Math.random() * 3) + 1; // ★ 1〜3 のランダムな整数を取得
+            const poleCount = Math.floor(Math.random() * 3) + 1;
             for (let i = 0; i < poleCount; i++) {
                 const poleY = Math.random() * 60 + 250;
                 const p = new Platform(poleX, poleY, 75, CANVAS_HEIGHT - poleY, 'pole');
@@ -905,7 +905,7 @@ function spawnStageElements() {
                 }
             }
 
-            // ダンゴ（テスト確認用: 80%の確率で出現。本番時は 0.02 に変更してください）
+            // ダンゴ（本番確率: 2%）
             // 既存ギミックと重ならない安全な位置を探して設置
             if (!player.hasDango && Math.random() < 0.02) {
                 const margin = 35;
@@ -997,11 +997,10 @@ function handleDamage() {
 }
 
 function update() {
-    // === 1. パフォーマンス改善（DOM更新の最適化） ===
+    // スコア計算と表示更新（DOM再構築負荷低減）
     distance += gameSpeed;
     const newScore = Math.floor(distance / 10);
 
-    // スコアが変わった時のみDOM（画面）を更新する
     if (score !== newScore) {
         score = newScore;
         scoreText.innerText = `${score}m`;
@@ -1034,9 +1033,7 @@ function update() {
 
     if (!currentlyGrounded) player.isGrounded = false;
 
-    // === 2. 当たり判定ロジックの共通化（共通関数を利用） ===
-
-    // ダンゴの獲得処理
+    // ダンゴの獲得処理（軽量な判定・表示切替）
     for (let i = dangos.length - 1; i >= 0; i--) {
         const d = dangos[i];
         d.update();
@@ -1096,7 +1093,7 @@ function update() {
         if (obs.x + obs.width < -50) obstacles.splice(i, 1);
     }
 
-    // ジャンプ台（特殊な踏む判定のため共通関数不使用）
+    // ジャンプ台
     for (let i = springPads.length - 1; i >= 0; i--) {
         const s = springPads[i];
         s.update();
@@ -1138,22 +1135,18 @@ function draw() {
     player.draw();
 }
 
-// === 3. 高リフレッシュレート対応（FPS固定制御） ===
+// 60FPS固定制御
 function gameLoop(currentTime) {
     if (gameState === 'PLAYING') {
         if (!lastTime) lastTime = currentTime;
         const deltaTime = currentTime - lastTime;
 
-        // 設定したFPS（60FPS）の時間間隔を超えた時だけ更新する
         if (deltaTime >= FRAME_INTERVAL) {
-            // 次のフレーム開始時間を調整（余剰時間を残すことでカクつき防止）
             lastTime = currentTime - (deltaTime % FRAME_INTERVAL);
-            
             update();
             draw();
         }
     } else {
-        // プレイ中以外はタイマーをリセット
         lastTime = 0;
     }
     
@@ -1210,12 +1203,10 @@ function startGame() {
     sfx.init();
     initGame();
     gameState = 'PLAYING';
-    lastTime = 0; // ループのタイマーをリセット
+    lastTime = 0;
 
     pushGameStateHistory();
     showScreen(null);
-
-    // gameLoopの初回起動はinit内に移動済みなのでここでは状態変更のみ
 }
 
 function pauseGame() {
@@ -1227,7 +1218,7 @@ function pauseGame() {
 function resumeGame() {
     if (gameState !== 'PAUSED') return;
     gameState = 'PLAYING';
-    lastTime = 0; // タイマーリセットで再開時のワープ（高速進行）を防ぐ
+    lastTime = 0;
     pushGameStateHistory();
     showScreen(null);
 }
