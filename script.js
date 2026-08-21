@@ -429,16 +429,25 @@ class FlyingShuriken {
         this.height = 26;
         this.rotation = 0;
         this.fromFront = fromFront;
-        // カラス(gameSpeed + 2.5)より速い速度設定
+
+        // カラス(gameSpeed + 2.5)より速い基準速度
+        const baseSpeed = fromFront ? (gameSpeed + 5.5) : (gameSpeed + 3.0);
+
+        // 水平から±33度程度の範囲でランダムな飛行角度をつける
+        const maxAngle = Math.PI / 5.5;
+        const angle = (Math.random() * 2 - 1) * maxAngle;
+
         if (fromFront) {
-            this.speedX = gameSpeed + 5.5; // 右から左へ高速飛行
+            this.speedX = baseSpeed * Math.cos(angle); // 右から左へ高速飛行
         } else {
-            this.speedX = -(gameSpeed + 3.0); // 左から右へ（スクロールを追い抜くため実質+3.0）
+            this.speedX = -(baseSpeed * Math.cos(angle)); // 左から右へ（スクロールを追い抜くため実質加算）
         }
+        this.speedY = baseSpeed * Math.sin(angle); // 斜め方向の縦移動成分
     }
 
     update() {
         this.x -= this.speedX;
+        this.y += this.speedY;
         this.rotation += 0.35;
     }
 
@@ -446,8 +455,10 @@ class FlyingShuriken {
         ctx.save();
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
-        
-        ctx.fillStyle = '#00e5ff';
+
+        ctx.shadowColor = '#ff2e88';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = '#ff2e88';
         for (let i = 0; i < 4; i++) {
             ctx.rotate(Math.PI / 2);
             ctx.beginPath();
@@ -459,6 +470,7 @@ class FlyingShuriken {
             ctx.fill();
         }
 
+        ctx.shadowBlur = 0;
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(0, 0, 3, 0, Math.PI * 2);
@@ -554,43 +566,20 @@ class Obstacle {
         this.width = width;
         this.height = height;
         this.type = type;
-        this.rotation = 0;
     }
 
     update() {
         this.x -= gameSpeed;
-        if (this.type === 'shuriken') {
-            this.rotation += 0.2;
-        }
     }
 
     draw() {
-        if (this.type === 'spike') {
-            ctx.fillStyle = '#ff3d00';
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y + this.height);
-            ctx.lineTo(this.x + this.width / 2, this.y);
-            ctx.lineTo(this.x + this.width, this.y + this.height);
-            ctx.closePath();
-            ctx.fill();
-        } else if (this.type === 'shuriken') {
-            ctx.save();
-            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-            ctx.rotate(this.rotation);
-            ctx.fillStyle = '#00e5ff';
-
-            for (let i = 0; i < 4; i++) {
-                ctx.rotate(Math.PI / 2);
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(-5, -15);
-                ctx.lineTo(0, -22);
-                ctx.lineTo(5, -15);
-                ctx.closePath();
-                ctx.fill();
-            }
-            ctx.restore();
-        }
+        ctx.fillStyle = '#ff3d00';
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + this.height);
+        ctx.lineTo(this.x + this.width / 2, this.y);
+        ctx.lineTo(this.x + this.width, this.y + this.height);
+        ctx.closePath();
+        ctx.fill();
     }
 }
 
@@ -655,9 +644,9 @@ function spawnStageElements() {
         const allowCrow = score >= 200;           // 200m: カラス
         const allowSpike = score >= 300;          // 300m: トゲ
         const allowSpring = score >= 500;         // 500m: ジャンプ台
-        const allowComplex = score >= 500;        // 800m: 複雑な足場
+        const allowComplex = score >= 800;        // 800m: 複雑な足場
         const allowEnemy = score >= 1000;         // 1000m: 敵忍者
-        const allowFlyingShuriken = score >= 100; // 1300m: 飛来する手裏剣
+        const allowFlyingShuriken = score >= 1300; // 1300m: 飛来する手裏剣
 
         // 足場間隔・幅の設定
         let minGap = 60, maxGap = 100, minWidth = 260, maxWidth = 420;
@@ -849,7 +838,7 @@ function update() {
         }
 
         // 画面外に出て消滅
-        if (fs.x < -150 || fs.x > CANVAS_WIDTH + 200) {
+        if (fs.x < -150 || fs.x > CANVAS_WIDTH + 200 || fs.y < -100 || fs.y > CANVAS_HEIGHT + 100) {
             flyingShurikens.splice(i, 1);
         }
     }
