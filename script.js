@@ -826,17 +826,20 @@ function spawnStageElements() {
                 enemyNinjas.push(new EnemyNinja(bottomPlat));
             }
         }
-        // 一本橋連続足場（1300m以上で高難易度生成）
+            
+        // 一本橋連続足場（1300m以上で高難易度生成: 1〜3本でランダム生成）
         else if (score >= 1300 && rand > 0.75) {
             let poleX = nextX;
-            for (let i = 0; i < 3; i++) {
+            const poleCount = Math.floor(Math.random() * 3) + 1; // ★ 1〜3 のランダムな整数を取得
+            for (let i = 0; i < poleCount; i++) {
                 const poleY = Math.random() * 60 + 250;
                 const p = new Platform(poleX, poleY, 75, CANVAS_HEIGHT - poleY, 'pole');
                 platforms.push(p);
-                if (i === 1) createdPlatform = p;
+                if (i === Math.floor(poleCount / 2)) createdPlatform = p;
                 poleX += 75 + Math.random() * 60 + 70;
             }
         }
+
         // 標準屋根足場
         else {
             const heightVariation = (score < 300) ? 50 : 100;
@@ -877,7 +880,7 @@ function spawnStageElements() {
 
             // ダンゴ（テスト確認用: 80%の確率で出現。本番時は 0.03 に変更してください）
             // 既存ギミックと重ならない安全な位置を探して設置
-            if (!player.hasDango && Math.random() < 0.8) {
+            if (!player.hasDango && Math.random() < 0.9) {
                 const margin = 35;
                 const minDangoX = newPlat.x + margin;
                 const maxDangoX = newPlat.x + newPlat.width - margin - 24;
