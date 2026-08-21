@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // DOM要素（init内で取得）
 let canvas, ctx;
 let startScreen, pauseScreen, gameOverScreen, topControlBar;
-let scoreText, titleHighScore, overHighScore, finalScoreText;
+let scoreText, titleHighScoreValue, overHighScore, finalScoreText;
 let startBtn, pauseBtn, resumeBtn, pauseHomeBtn, restartBtn, overHomeBtn;
 
 function init() {
@@ -31,7 +31,7 @@ function init() {
     gameOverScreen = document.getElementById('gameOverScreen');
     topControlBar = document.getElementById('topControlBar');
     scoreText = document.getElementById('scoreText');
-    titleHighScore = document.getElementById('titleHighScore');
+    titleHighScoreValue = document.getElementById('titleHighScoreValue');
     overHighScore = document.getElementById('overHighScore');
     finalScoreText = document.getElementById('finalScoreText');
 
@@ -154,7 +154,7 @@ function loadHighScore() {
     } catch (e) {
         highScore = 0;
     }
-    titleHighScore.innerText = `HIGH SCORE: ${highScore}m`;
+    titleHighScoreValue.innerText = `${highScore}m`;
     overHighScore.innerText = `HIGH SCORE: ${highScore}m`;
 }
 
@@ -165,7 +165,7 @@ function saveHighScore(newScore) {
             localStorage.setItem('ninja_runner_highscore', highScore);
         } catch (e) {}
     }
-    titleHighScore.innerText = `HIGH SCORE: ${highScore}m`;
+    titleHighScoreValue.innerText = `${highScore}m`;
     overHighScore.innerText = `HIGH SCORE: ${highScore}m`;
 }
 
