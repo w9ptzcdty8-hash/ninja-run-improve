@@ -439,18 +439,28 @@ class FlyingShuriken {
             // 上端（画面右側1/3の幅から出現）
             this.x = rightAreaMinX + Math.random() * (rightAreaMaxX - rightAreaMinX);
             this.y = -40;
-            // 斜め左下方向へ飛ぶ
-            const angle = Math.PI / 4 + (Math.random() * 0.2 - 0.1); // 約45度
+            // 【変更】 30度〜45度の範囲で斜め左下へ飛ぶ（度数をラジアンに変換）
+            const minDeg = 30;
+            const maxDeg = 45;
+            const deg = minDeg + Math.random() * (maxDeg - minDeg); // 30 ~ 45度
+            const angle = deg * (Math.PI / 180);
+
             this.speedX = baseSpeed * Math.cos(angle);
             this.speedY = baseSpeed * Math.sin(angle);
+
         } else if (spawnSide === 'bottom') {
             // 下端（画面右側1/3の幅から出現）
             this.x = rightAreaMinX + Math.random() * (rightAreaMaxX - rightAreaMinX);
             this.y = CANVAS_HEIGHT + 10;
-            // 斜め左上方向へ飛ぶ
-            const angle = -Math.PI / 4 + (Math.random() * 0.2 - 0.1); // 約-45度
+            // 【変更】 30度〜45度の範囲で斜め左上へ飛ぶ（下端からのためマイナス）
+            const minDeg = 30;
+            const maxDeg = 45;
+            const deg = minDeg + Math.random() * (maxDeg - minDeg); // 30 ~ 45度
+            const angle = -deg * (Math.PI / 180);
+
             this.speedX = baseSpeed * Math.cos(angle);
             this.speedY = baseSpeed * Math.sin(angle);
+
         } else {
             // 右端（縦方向は上側〜中央付近）
             this.x = CANVAS_WIDTH + 30;
