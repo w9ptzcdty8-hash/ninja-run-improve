@@ -422,24 +422,45 @@ class Crow {
 // ========================================
 
 class FlyingShuriken {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor(spawnSide) {
         this.width = 26;
         this.height = 26;
         this.rotation = 0;
 
-        // スピードをランダム（+4.0 ～ +7.0）にして個体差をつける
-        const randomSpeedOffset = 4.0 + Math.random() * 3.0;
+        // ランダムなスピード（+3.5 ～ +6.5）
+        const randomSpeedOffset = 3.5 + Math.random() * 3.0;
         const baseSpeed = gameSpeed + randomSpeedOffset;
 
-        // 水平から±33度程度の範囲でランダムな飛行角度をつける
-        const maxAngle = Math.PI / 5.5;
-        const angle = (Math.random() * 2 - 1) * maxAngle;
+        // 画面右側 1/3 の範囲（X軸: 2/3 ~ 1.0 の領域）
+        const rightAreaMinX = CANVAS_WIDTH * (2 / 3);
+        const rightAreaMaxX = CANVAS_WIDTH;
 
-        // 常に右から左へ飛来
-        this.speedX = baseSpeed * Math.cos(angle);
-        this.speedY = baseSpeed * Math.sin(angle);
+        if (spawnSide === 'top') {
+            // 上端（画面右側1/3の幅から出現）
+            this.x = rightAreaMinX + Math.random() * (rightAreaMaxX - rightAreaMinX);
+            this.y = -40;
+            // 斜め左下方向へ飛ぶ
+            const angle = Math.PI / 4 + (Math.random() * 0.2 - 0.1); // 約45度
+            this.speedX = baseSpeed * Math.cos(angle);
+            this.speedY = baseSpeed * Math.sin(angle);
+        } else if (spawnSide === 'bottom') {
+            // 下端（画面右側1/3の幅から出現）
+            this.x = rightAreaMinX + Math.random() * (rightAreaMaxX - rightAreaMinX);
+            this.y = CANVAS_HEIGHT + 10;
+            // 斜め左上方向へ飛ぶ
+            const angle = -Math.PI / 4 + (Math.random() * 0.2 - 0.1); // 約-45度
+            this.speedX = baseSpeed * Math.cos(angle);
+            this.speedY = baseSpeed * Math.sin(angle);
+        } else {
+            // 右端（縦方向は上側〜中央付近）
+            this.x = CANVAS_WIDTH + 30;
+            this.y = Math.random() * 220 + 50;
+            // 水平〜斜め方向へ飛ぶ
+            const maxAngle = Math.PI / 5.5;
+            const angle = (Math.random() * 2 - 1) * maxAngle;
+            this.speedX = baseSpeed * Math.cos(angle);
+            this.speedY = baseSpeed * Math.sin(angle);
+        }
     }
 
     update() {
@@ -639,12 +660,12 @@ function spawnStageElements() {
     if (lastPlatform.x + lastPlatform.width < CANVAS_WIDTH + 300) {
 
         // 解禁タイミングの制御フラグ
-        const allowCrow = score >= 1200;           // 200m: カラス
-        const allowSpike = score >= 1300;          // 300m: トゲ
-        const allowSpring = score >= 1500;         // 500m: ジャンプ台
-        const allowComplex = score >= 1800;        // 800m: 複雑な足場
+        const allowCrow = score >= 200;           // 200m: カラス
+        const allowSpike = score >= 300;          // 300m: トゲ
+        const allowSpring = score >= 500;         // 500m: ジャンプ台
+        const allowComplex = score >= 800;        // 800m: 複雑な足場
         const allowEnemy = score >= 1000;         // 1000m: 敵忍者
-        const allowFlyingShuriken = score >= 10; // 1300m: 飛来する手裏剣
+        const allowFlyingShuriken = score >= 1300; // 1300m: 飛来する手裏剣
 
         // 足場間隔・幅の設定
         let minGap = 60, maxGap = 100, minWidth = 260, maxWidth = 420;
@@ -712,11 +733,14 @@ function spawnStageElements() {
             crows.push(new Crow(CANVAS_WIDTH + 100, crowY));
         }
 
-        // 飛来する手裏剣（1300m解禁: 右側からのみ高速飛来）
+        // 飛来する手裏剣（1300m解禁: 画面右側1/3範囲の 上・下・右端から出現）
         if (allowFlyingShuriken && Math.random() < 0.3) {
-            const shurikenY = Math.random() * 160 + 100;
-            const startX = CANVAS_WIDTH + 150;
-            flyingShurikens.push(new FlyingShuriken(startX, shurikenY));
+            const randSide = Math.random();
+            let spawnSide = 'right';
+            if (randSide < 0.35) spawnSide = 'top';
+            else if (randSide < 0.7) spawnSide = 'bottom';
+
+            flyingShurikens.push(new FlyingShuriken(spawnSide));
         }
     }
 }
@@ -834,7 +858,7 @@ function update() {
             triggerGameOver();
         }
 
-        // 画面外に出て消滅
+        // 画面外に出て消滅（上下左右の画面外）
         if (fs.x < -150 || fs.x > CANVAS_WIDTH + 200 || fs.y < -100 || fs.y > CANVAS_HEIGHT + 100) {
             flyingShurikens.splice(i, 1);
         }
